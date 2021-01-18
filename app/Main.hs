@@ -185,7 +185,7 @@ main = do
     putStrLn $ ".******------ CUSTOMERS CREATED ------******." 
     
     ---- ADD 10x transactions here and it works
-    forM_ [1..4] $ \_ -> do
+    forM_ [1..10] $ \_ -> do
         
   
     
