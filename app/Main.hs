@@ -53,30 +53,49 @@ transfer from to amount
  
 process :: Name -> Customer -> MVar Customer -> MVar Value -> MVar Customer -> MVar Balance -> MVar Balance -> MVar Balance -> MVar Balance -> IO () 
 process name customer mvar value customerlist balance1 balance2 balance3 balance4 = do
+  {-forM_ [1..3] $ \_ -> do-}
     c1 <- coinFlip
-    putStrLn $ name ++ "'s turn, they -- got " ++ (show c1) 
-       
+    putStrLn $ name ++ "'s turn, they -- got " ++ (show c1)    
     if c1 == Head then do
         putMVar mvar customer
         putMVar customerlist customer
+        r1 <- randomAmount
         r2 <- randomCustIndex
-        putStrLn $ name ++ " -- got " ++ (show r2)
+        putStrLn $ name ++ " -- got " ++ (show r2) ++ "-- and random amount is -- " ++ (show r1)
         putMVar value r2
         if r2 == 0 then do 
             number <- takeMVar balance1
-            let newnumber = number + 10
+            let newnumber = number + r1
             putMVar balance1 newnumber
         else if r2 == 1 then do
           number <- takeMVar balance2
-          let newnumber = number + 20
+          let newnumber = number + r1
           putMVar balance2 newnumber
+          --------------------------- attempt at withdrawals
+          if name == "C1" then do
+                number <- takeMVar balance1
+                let newnumber = number - r1
+                putMVar balance1 newnumber
+          else if name == "C3" then do
+                number <- takeMVar balance3
+                let newnumber = number - r1
+                putMVar balance3 newnumber  
+          else if name == "C4" then do
+                number <- takeMVar balance4
+                let newnumber = number - r1
+                putMVar balance4 newnumber  
+            else do 
+                number <- takeMVar balance2
+                let newnumber = number - r1
+                putMVar balance2 newnumber       
+        ----------------------------------  attempt at withdrawals     
         else if r2 == 2 then do
           number <- takeMVar balance3
-          let newnumber = number + 30
+          let newnumber = number + r1
           putMVar balance3 newnumber 
          else do  
             number <- takeMVar balance4
-            let newnumber = number + 40
+            let newnumber = number + r1
             putMVar balance4 newnumber    
     
     else do    
@@ -172,7 +191,7 @@ main = do
        let index = (c!!rvalue1)
        z <- readMVar index 
        n <- randomAmount
-       putStrLn $ "RANDOM AMOUNT: " ++ show n
+       --putStrLn $ "RANDOM AMOUNT: " ++ show n
        
 
        let index2 = (c!!rvalue2)
