@@ -51,8 +51,8 @@ transfer from to amount
 
 -- THREAD PROCESS
  
-process :: Name -> Customer -> MVar Customer -> MVar Value -> MVar Customer -> MVar Customer -> MVar Bool -> IO () 
-process name customer mvar value customerlist b c = do
+process :: Name -> Customer -> MVar Customer -> MVar Value -> MVar Customer -> MVar Balance -> MVar Balance -> MVar Balance -> MVar Balance -> IO () 
+process name customer mvar value customerlist balance1 balance2 balance3 balance4 = do
     c1 <- coinFlip
     putStrLn $ name ++ "'s turn, they -- got " ++ (show c1) 
        
@@ -64,7 +64,7 @@ process name customer mvar value customerlist b c = do
         putMVar value r2
     else do    
         randomRIO (1,50) >>= \r -> threadDelay (r * 100000)
-        process name customer mvar value customerlist b c
+        process name customer mvar value customerlist balance1 balance2 balance3 balance4
     
     
 -- MAIN FUNCTION        
@@ -103,7 +103,7 @@ main = do
        c <- newEmptyMVar
        putStrLn $ ".******------ EMPTY MVARS CREATED ------******."
        randomRIO (1,50) >>= \r -> threadDelay (r * 100000)
-       mapM_ forkIO [process "C1" c1 one value1 customerlist b c, process "C2" c2 two value2 customerlist b c, process "C3" c3 three value3 customerlist b c, process "C4" c4 four value4 customerlist b c]
+       mapM_ forkIO [process "C1" c1 one value1 customerlist balance1 balance2 balance3 balance4, process "C2" c2 two value2 customerlist balance1 balance2 balance3 balance4, process "C3" c3 three value3 customerlist balance1 balance2 balance3 balance4, process "C4" c4 four value4 customerlist balance1 balance2 balance3 balance4]
        putStrLn $ ".******------ THREADS RUNNING ------******."
 
     -- haven't used this
