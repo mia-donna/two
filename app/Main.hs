@@ -50,10 +50,16 @@ transfer from to amount
 -}
 
 -- THREAD PROCESS
+-- INDEX --
+-- C1 balance1 = 0 
+-- C2 balance2 = 1
+-- C3 balance3 = 2
+-- C4 balance4 = 3
+
  
 process :: Name -> Customer -> MVar Customer -> MVar Value -> MVar Customer -> MVar Balance -> MVar Balance -> MVar Balance -> MVar Balance -> IO () 
 process name customer mvar value customerlist balance1 balance2 balance3 balance4 = do
-  {-forM_ [1..3] $ \_ -> do-}
+ {- forM_ [1..3] $ \_ -> do -}
     c1 <- coinFlip
     putStrLn $ name ++ "'s turn, they -- got " ++ (show c1)    
     if c1 == Head then do
@@ -63,41 +69,101 @@ process name customer mvar value customerlist balance1 balance2 balance3 balance
         r2 <- randomCustIndex
         putStrLn $ name ++ " -- got " ++ (show r2) ++ "-- and random amount is -- " ++ (show r1)
         putMVar value r2
+
         if r2 == 0 then do 
             number <- takeMVar balance1
             let newnumber = number + r1
             putMVar balance1 newnumber
+        ----------------------------------- 1 attempt at withdrawals
+            if name == "C2" then do
+                number <- takeMVar balance2
+                let newnumber = number - r1
+                putMVar balance2 newnumber
+            else if name == "C3" then do
+                number <- takeMVar balance3
+                let newnumber = number - r1
+                putMVar balance3 newnumber  
+            else if name == "C4" then do
+                number <- takeMVar balance4
+                let newnumber = number - r1
+                putMVar balance4 newnumber  
+              else do 
+                number <- takeMVar balance1
+                let newnumber = number - r1
+                putMVar balance1 newnumber
+        ----------------------------------- 1 attempt at withdrawals    
+
+
         else if r2 == 1 then do
-          number <- takeMVar balance2
+            number <- takeMVar balance2
+            let newnumber = number + r1
+            putMVar balance2 newnumber
+          --------------------------- 2 attempt at withdrawals
+            if name == "C1" then do
+                number <- takeMVar balance1
+                let newnumber = number - r1
+                putMVar balance1 newnumber
+            else if name == "C3" then do
+                number <- takeMVar balance3
+                let newnumber = number - r1
+                putMVar balance3 newnumber  
+            else if name == "C4" then do
+                number <- takeMVar balance4
+                let newnumber = number - r1
+                putMVar balance4 newnumber  
+              else do 
+                number <- takeMVar balance2
+                let newnumber = number - r1
+                putMVar balance2 newnumber       
+        ---------------------------------- 2 attempt at withdrawals  
+
+
+        else if r2 == 2 then do
+          number <- takeMVar balance3
           let newnumber = number + r1
-          putMVar balance2 newnumber
-          --------------------------- attempt at withdrawals
+          putMVar balance3 newnumber 
+        --------------------------- 3 attempt at withdrawals
           if name == "C1" then do
                 number <- takeMVar balance1
                 let newnumber = number - r1
                 putMVar balance1 newnumber
-          else if name == "C3" then do
-                number <- takeMVar balance3
+          else if name == "C2" then do
+                number <- takeMVar balance2
                 let newnumber = number - r1
-                putMVar balance3 newnumber  
+                putMVar balance2 newnumber  
           else if name == "C4" then do
                 number <- takeMVar balance4
                 let newnumber = number - r1
                 putMVar balance4 newnumber  
             else do 
-                number <- takeMVar balance2
+                number <- takeMVar balance3
                 let newnumber = number - r1
-                putMVar balance2 newnumber       
-        ----------------------------------  attempt at withdrawals     
-        else if r2 == 2 then do
-          number <- takeMVar balance3
-          let newnumber = number + r1
-          putMVar balance3 newnumber 
-         else do  
+                putMVar balance3 newnumber       
+        ---------------------------------- 3 attempt at withdrawals 
+
+
+         else do 
             number <- takeMVar balance4
             let newnumber = number + r1
             putMVar balance4 newnumber    
-    
+        --------------------------- 4 attempt at withdrawals
+            if name == "C1" then do
+                number <- takeMVar balance1
+                let newnumber = number - r1
+                putMVar balance1 newnumber
+            else if name == "C2" then do
+                number <- takeMVar balance2
+                let newnumber = number - r1
+                putMVar balance2 newnumber  
+            else if name == "C3" then do
+                number <- takeMVar balance3
+                let newnumber = number - r1
+                putMVar balance3 newnumber  
+              else do 
+                number <- takeMVar balance4
+                let newnumber = number - r1
+                putMVar balance4 newnumber       
+        ---------------------------------- 4 attempt at withdrawals 
     else do    
 
         randomRIO (1,50) >>= \r -> threadDelay (r * 100000)
@@ -118,7 +184,8 @@ main = do
     let c4 = Customer {name = "C4", balance = balance4, account = 4} 
     putStrLn $ ".******------ CUSTOMERS CREATED ------******." 
     
-    forM_ [1..1] $ \_ -> do
+    ---- ADD 10x transactions here and it works
+    forM_ [1..4] $ \_ -> do
         
   
     
