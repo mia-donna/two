@@ -60,9 +60,27 @@ process name customer mvar value customerlist balance1 balance2 balance3 balance
         putMVar mvar customer
         putMVar customerlist customer
         r2 <- randomCustIndex
-        putStrLn $ name ++ " -- got " ++ (show r2) 
+        putStrLn $ name ++ " -- got " ++ (show r2)
         putMVar value r2
+        if r2 == 0 then do 
+            number <- takeMVar balance1
+            let newnumber = number + 10
+            putMVar balance1 newnumber
+        else if r2 == 1 then do
+          number <- takeMVar balance2
+          let newnumber = number + 20
+          putMVar balance2 newnumber
+        else if r2 == 2 then do
+          number <- takeMVar balance3
+          let newnumber = number + 30
+          putMVar balance3 newnumber 
+         else do  
+            number <- takeMVar balance4
+            let newnumber = number + 40
+            putMVar balance4 newnumber    
+    
     else do    
+
         randomRIO (1,50) >>= \r -> threadDelay (r * 100000)
         process name customer mvar value customerlist balance1 balance2 balance3 balance4
     
@@ -165,6 +183,20 @@ main = do
 
        let index4 = (c!!rvalue4)
        v <- readMVar index4
+       
+
+       bal1 <- readMVar  balance1
+       print bal1
+    
+       bal2 <- readMVar  balance2
+       print bal2
+
+       bal3 <- readMVar  balance3
+       print bal3
+
+       bal4 <- readMVar balance4
+       print bal4
+
 
        putStrLn $ ".******------ TEST || THREADS ALL RUN - EXIT ------******."
     
